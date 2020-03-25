@@ -4,41 +4,30 @@ import Input from "@material-ui/core/Input";
 import Checkbox from "@material-ui/core/Checkbox";
 import axios from 'axios';
 import DeleteRoundedIcon from '@material-ui/icons/DeleteRounded';
-import { makeStyles } from '@material-ui/core/styles';
-
-const useStyles = makeStyles(theme => ({
-    root: {
-        '& > *': {
-            margin: theme.spacing(1),
-        },
-    },
-}));
-
-// function Hello(props) {
-//     return <div className="content">
-//              <p> Xin chào {props.name} </p>
-//              <Button variant="contained" color="primary"> OK</Button>
-//             </div>
-// }
-
+import {makeStyles} from '@material-ui/core/styles';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import TodoFooter from "./TodoFooter";
 
 export default class Hello extends React.Component {
     constructor(props) {
         super(props);
         this.createNewTodo = this.createNewTodo.bind(this);
+        this.handleChangeView = this.handleChangeView.bind(this);
     }
+
     state = {
         persons: [],
         value: '',
         listTodo: [],
-        isChecked: false
+        isChecked: false,
+        viewItem: 'all',
+        isSelectedAll: false
     };
 
     // Bằng created trong Vue js
     componentDidMount() {
-        axios.get('https://jsonplaceholder.typicode.com/todos').then(response => {
-            const persons = response.data;
-            // this.setState({persons});
+        axios.get('http://newsapi.org/v2/everything?q=bitcoin&from=2020-02-25&sortBy=publishedAt&apiKey=4935afeda0664970a9ebe9f9c3001512').then(response => {
+            console.log(response);
         })
     }
 
@@ -53,7 +42,7 @@ export default class Hello extends React.Component {
             this.setState({value: ''});
             const array = [...this.state.persons];
             array.unshift(resp.data);
-            this.setState({ persons: array})
+            this.setState({persons: array})
         })
     }
 
@@ -66,21 +55,28 @@ export default class Hello extends React.Component {
 
         if (value) {
             let array = [...this.state.persons];
-            array.unshift({title: value, status: false});
+            array.unshift({
+                id:Math.floor(Math.random() * 1000),
+                title: value,
+                status: false
+            });
             this.setState({value: '', persons: array});
         }
     }
 
-    removeItem(index) {
+    removeItem(todoItem, index) {
         let array = [...this.state.persons];
-        array.splice(index, 1);
+        array = array.filter(o => {
+            return o.id !== todoItem.id
+        });
         this.setState({persons: array});
     }
 
-    handelCheckBox(index = 1) {
+    handelCheckBox(todoItem, index) {
+        // dùng như này sẽ khiến có nhiều dữ liệu sẽ bị lag ( nên dùng check index )
         this.setState({
             persons: this.state.persons.map((o, i) => {
-                return i === index ? {
+                return o.id === todoItem.id ? {
                     ...o,
                     status: !o.status
                 } : o
@@ -101,22 +97,39 @@ export default class Hello extends React.Component {
             persons: this.state.persons.map((o) => {
                 return {
                     ...o,
-                    status: !o.status
+                    status: !this.state.isSelectedAll
                 }
-            })
+            }),
+            isSelectedAll: !this.state.isSelectedAll
         });
+    }
+
+    handleChangeView(value) {
+        this.setState({
+            viewItem: value
+        })
     }
 
     render() {
         const count = this.state.persons.filter(o => {
             return o.status === false
         }).length;
-        return  <div className="content">
+        let persons = this.state.persons;
+        if (this.state.viewItem === 'completed') {
+            persons = persons.filter(o => {
+                return o.status === true
+            })
+        } else if (this.state.viewItem === 'active') {
+            persons = persons.filter(o => {
+                return o.status === false
+            })
+        }
+        return <div className="content">
             <p> Chưa hoàn thành: {count} </p>
             <div className="button-todo">
                 <Button variant="contained"
-                         color="primary"
-                         onClick={this.testClick.bind(this)}> Created </Button>
+                        color="primary"
+                        onClick={this.testClick.bind(this)}> Created </Button>
                 <Button variant="contained"
                         color="primary"
                         onClick={() => this.toggleAll()}> Select All </Button>
@@ -130,23 +143,27 @@ export default class Hello extends React.Component {
                    onKeyDown={this.createNewTodo}
                    placeholder="Input todo"/>
             <ul>
-                {this.state.persons.map((o, index) => {
-                    return <li className="item-todo" key={index}>
+                {persons.map((o, index) => {
+                    return <li className={'item-todo'} key={index}>
+                        <span>{o.id}</span>
                        <span>
                            <Checkbox
                                disableRipple
                                checked={o.status}
-                               onChange={this.handelCheckBox.bind(this, index)}
+                               onChange={this.handelCheckBox.bind(this, o, index)}
                                color="primary"
-                               inputProps={{ 'aria-label': 'secondary checkbox' }}
-                            />
+                               inputProps={{'aria-label': 'secondary checkbox'}}
+                           />
                        </span>
-                        <span>{o.title} {o.status.toString()} </span>
-                        <DeleteRoundedIcon onClick={() => this.removeItem(index)}
+                        <span className={o.status ? 'active' : ''}>{o.title} </span>
+                        <DeleteRoundedIcon onClick={() => this.removeItem(o, index)}
                                            titleAccess="Xóa"/>
                     </li>
                 })}
             </ul>
+            <TodoFooter count={count}
+                        view={this.state.viewItem}
+                        on-change-view={this.handleChangeView}/>
         </div>
     }
 }
