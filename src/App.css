@@ -1,7 +1,3 @@
-.App {
-  text-align: center;
-}
-
 .App-logo {
   height: 40vmin;
   pointer-events: none;
@@ -54,8 +50,4 @@ ul {
 }
 .button-todo {
   margin: 0 10px;
-}
-
-.test {
-	
 }

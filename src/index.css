@@ -5,9 +5,58 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: rgb(47, 51, 65) !important;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+.card-hero-inner {
+  background: rgb(36, 38, 51);
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  color: #ffffff;
+  margin: 10px 8px;
+  padding: 10px;
+  width: 100px;
+  height: 150px;
+  border-radius: 10px;
+  font-size: 10px;
+}
+
+.card-hero-inner .hero-image{
+  border: 2px solid rgb(201, 170, 113);
+  width: 72px;
+  height: 72px;
+  border-radius: 50%
+}
+
+#menu-champion {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.search-inner {
+  display: flex;
+  justify-content: center;
+}
+
+.search-hero {
+  border: none;
+  border-bottom: 2px solid rgb(201, 170, 113);
+  outline: none;
+  background-color: rgb(47, 51, 65);
+  padding: 10px;
+  font-size: 28px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+::placeholder {
+  color: rgba(255, 255, 255, 0.6);
 }
